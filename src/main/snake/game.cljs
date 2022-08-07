@@ -42,7 +42,7 @@
          direction :direction} state]
     (assoc state
            :snake (conj (vec (rest snake))
-                        (get-next-pos (last snake) direction)))))
+                        (get-next-pos (peek snake) direction)))))
 
 (defn eat-or-move
   [state]
@@ -61,8 +61,9 @@
 
 (defn self-collided?
   [{snake :snake}]
-  (boolean (some #(= % (peek snake))
-                 (butlast snake))))
+  (let [snake-head (peek snake)]
+    (boolean (some #(= % snake-head)
+                   (butlast snake)))))
 
 (defn check-dead
   [state]

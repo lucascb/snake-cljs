@@ -6,6 +6,7 @@
 (def block-size (/ grid-size 10))
 (def canvas-size (* grid-size block-size))
 (def mid-screen (/ canvas-size 2))
+(def game-clock 70)
 
 ;; HTML Elements
 (def canvas (.getElementById js/document "game-canvas"))
@@ -64,7 +65,7 @@
     (draw-game-state state)
     (cond (not (:dead state))
           (do (swap! game-state game/get-next-state)
-              (js/setTimeout #(game-loop game-state) 70))
+              (js/setTimeout #(game-loop game-state) game-clock))
           :else (game-over))))
 
 (defn start-game
