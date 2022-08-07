@@ -1,0 +1,12 @@
+{
+  "name": "snake-cljs",
+  "version": "1.0",
+  "author": {
+    "email": "lucascbernardes@live.com",
+    "name": "Lucas Bernardes"
+  },
+  "private": true,
+  "devDependencies": {
+    "shadow-cljs": "2.19.8"
+  }
+}
