@@ -18,17 +18,18 @@
 (def game-state (atom {}))
 
 ;; UI handlers
-(defn change-direction-on-keydown!
-  [event state]
-  (let [direction (case (.-key event)
-                    "ArrowLeft" :left
-                    "ArrowUp" :up
-                    "ArrowRight" :right
-                    "ArrowDown" :down)]
-    (swap! state #(game/change-direction % direction))))
+(defn change-direction-on-keydown
+  [event]
+  (when-let [direction (case (.-key event)
+                         "ArrowLeft" :left
+                         "ArrowUp" :up
+                         "ArrowRight" :right
+                         "ArrowDown" :down
+                         nil)]
+    (swap! game-state #(game/change-direction % direction))))
 
 (defn draw-block
-  [canvas-ctx block-size [x y]]
+  [[x y]]
   (.fillRect canvas-ctx
              (* x block-size)
              (* y block-size)
@@ -39,19 +40,26 @@
   [score high-score]
   (str "Score: " score " - High Score: " high-score))
 
+(defn clear-screen
+  []
+  (set! (.-fillStyle canvas-ctx) "rgb(255,255,255)")
+  (.fillRect canvas-ctx 0 0 canvas-size canvas-size))
+
+(defn set-score
+  [score high-score]
+  (set! (.-innerHTML score-txt) (get-scores-display-text score high-score)))
+
 (defn draw-game-state
   [{snake :snake
     food :food
     score :score
-    high-score :high-score}]
-  (let [draw (partial draw-block canvas-ctx block-size)]
-    (set! (.-fillStyle canvas-ctx) "rgb(255,255,255)")
-    (.fillRect canvas-ctx 0 0 canvas-size canvas-size)
-    (set! (.-fillStyle canvas-ctx) "rgb(255,0,0)")
-    (draw food)
-    (set! (.-fillStyle canvas-ctx) "rgb(0,0,0)")
-    (doseq [part snake] (draw part))
-    (set! (.-innerHTML score-txt) (get-scores-display-text score high-score))))
+    high-score :high-score}] 
+  (clear-screen)
+  (set! (.-fillStyle canvas-ctx) "rgb(255,0,0)")
+  (draw-block food)
+  (set! (.-fillStyle canvas-ctx) "rgb(0,0,0)")
+  (doseq [part snake] (draw-block part))
+  (set-score score high-score))
 
 (defn game-over
   []
@@ -60,35 +68,31 @@
   (set! (.-disabled start-button) false))
 
 (defn game-loop
-  [game-state]
+  []
   (let [state @game-state]
     (draw-game-state state)
     (cond (not (:dead state))
           (do (swap! game-state game/get-next-state)
-              (js/setTimeout #(game-loop game-state) game-clock))
+              (js/setTimeout game-loop game-clock))
           :else (game-over))))
 
 (defn start-game
-  [game-state grid-size]
-  (let [state @game-state]
-    (cond (empty? state)
-          (swap! game-state #(game/get-initial-state grid-size 0))
-          :else (swap! game-state
-                       #(game/get-initial-state grid-size (:high-score state))))
+  []
+  (let [high-score (get @game-state :high-score 0)]
+    (swap! game-state #(game/get-initial-state grid-size high-score))
     (set! (.-disabled start-button) true)
-    (game-loop game-state)))
+    (game-loop)))
 
 (defn init-game-screen
   []
   (set! (.-width canvas) canvas-size)
   (set! (.-height canvas) canvas-size)
-  (set! (.-fillStyle canvas-ctx) "rgb(255,255,255)")
-  (.fillRect canvas-ctx 0 0 canvas-size canvas-size)
-  (set! (.-innerHTML score-txt) (get-scores-display-text 0 0))
+  (clear-screen)
+  (set-score 0 0)
   (.addEventListener js/document
                      "keydown"
-                     #(change-direction-on-keydown! % game-state))
-  (set! (.-onclick start-button) #(start-game game-state grid-size)))
+                     change-direction-on-keydown)
+  (set! (.-onclick start-button) start-game))
 
 (defn -main
   []
