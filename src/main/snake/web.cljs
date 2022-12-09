@@ -14,8 +14,9 @@
 (def score-txt (.getElementById js/document "score"))
 (def start-button (.getElementById js/document "start"))
 
-;; Game state
-(def game-state (atom {}))
+;; Global states
+(defonce game-state (atom {}))
+(defonce touch-state (atom []))
 
 ;; UI handlers
 (defn change-direction-on-keydown
@@ -27,6 +28,30 @@
                          "ArrowDown" :down
                          nil)]
     (swap! game-state #(game/change-direction % direction))))
+
+(defn- get-touch-pos
+  [event]
+  (let [touch-event (first (.-touches event))
+        touch-x (.-clientX touch-event)
+        touch-y (.-clientY touch-event)]
+    [touch-x touch-y]))
+
+(defn handle-touch-start
+  [event]
+  (swap! touch-state #(get-touch-pos event)))
+
+(defn handle-touch-move
+  [event]
+  (when-let [state (seq @touch-state)]
+    (let [[x-start y-start] state
+          [x y] (get-touch-pos event)
+          x-diff (- x-start x)
+          y-diff (- y-start y)
+          direction (if (> (abs x-diff) (abs y-diff))
+                      (if (pos? x-diff) :left :right)
+                      (if (pos? y-diff) :up :down))]
+      (swap! game-state #(game/change-direction % direction))
+      (reset! touch-state []))))
 
 (defn draw-block
   [[x y]]
@@ -92,6 +117,12 @@
   (.addEventListener js/document
                      "keydown"
                      change-direction-on-keydown)
+  (.addEventListener js/document
+                     "touchstart"
+                     handle-touch-start)
+  (.addEventListener js/document
+                     "touchmove"
+                     handle-touch-move)
   (set! (.-onclick start-button) start-game))
 
 (defn -main
