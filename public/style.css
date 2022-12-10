@@ -2,10 +2,15 @@ body {
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     background: rgb(0,203,213);
     background: radial-gradient(circle, rgba(0,203,213,1) 0%, rgba(0,255,225,1) 50%, rgba(0,212,255,1) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #container {
-    padding-top: 100px;
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
 }
 
 #header {
