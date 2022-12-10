@@ -1,7 +1,7 @@
 (ns snake.game
   (:require [clojure.set :as set]))
 
-(defn get-next-food-pos
+(defn- get-next-food-pos
   [grid-size snake]
   (let [all-pos (set (for [x (range grid-size)
                            y (range grid-size)]
@@ -12,64 +12,50 @@
          vec
          rand-nth)))
 
-(defn get-next-pos
-  [[x y] direction]
+(defn- get-next-pos
+  [[x y] direction grid-size]
   (case direction
-    :right [(inc x) y]
-    :left [(dec x) y]
-    :up [x (dec y)]
-    :down [x (inc y)]))
+    :right [(mod (inc x) grid-size) y]
+    :left [(mod (dec x) grid-size) y]
+    :up [x (mod (dec y) grid-size)]
+    :down [x (mod (inc y) grid-size)]))
 
-(defn will-get-food?
-  [snake direction food]
-  (= food (get-next-pos (peek snake) direction)))
+(defn- will-get-food?
+  [snake direction food grid-size]
+  (= food (get-next-pos (peek snake) direction grid-size)))
 
-(defn eat
+(defn- eat
   [state]
-  (let [{grid-size :grid-size
-         snake :snake
-         food :food
-         score :score} state
+  (let [{:keys [grid-size snake food score]} state
         growed-snake (conj snake food)]
     (assoc state
            :snake growed-snake
            :food (get-next-food-pos grid-size growed-snake)
            :score (inc score))))
 
-(defn move
+(defn- move
   [state]
-  (let [{snake :snake
-         direction :direction} state]
+  (let [{:keys [snake direction grid-size]} state]
     (assoc state
            :snake (conj (vec (rest snake))
-                        (get-next-pos (peek snake) direction)))))
+                        (get-next-pos (peek snake) direction grid-size)))))
 
-(defn eat-or-move
+(defn- eat-or-move
   [state]
-  (let [{snake :snake
-         direction :direction
-         food :food} state]
-    (cond (will-get-food? snake direction food)
+  (let [{:keys [snake direction food grid-size]} state]
+    (cond (will-get-food? snake direction food grid-size)
           (eat state)
           :else (move state))))
 
-(defn outside-screen?
-  [{grid-size :grid-size snake :snake}]
-  (let [[x y] (peek snake)]
-    (not (and (< 0 x grid-size)
-              (< 0 y grid-size)))))
-
-(defn self-collided?
+(defn- self-collided?
   [{snake :snake}]
   (let [snake-head (peek snake)]
     (boolean (some #(= % snake-head)
                    (butlast snake)))))
 
-(defn check-dead
+(defn- check-dead
   [state]
-  (assoc state
-         :dead (or (outside-screen? state)
-                   (self-collided? state))))
+  (assoc state :dead (self-collided? state)))
 
 (defn update-high-score
   [state]
