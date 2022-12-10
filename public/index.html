@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <head>
     <meta charset="utf-8" />
     <title>Snake Cljs</title>
@@ -12,9 +13,11 @@
         <h2 id="score"></h2>
       </div>
       <div id="game">
-        <canvas id="game-canvas" width="0" height="0">
-          Snake game
-        </canvas>
+        <canvas id="game-canvas">Snake game</canvas>
+      </div>
+      <div id="instructions">
+        <p>Use the keyboard arrows or swipe to move the Snake.</p>
+        <p id="game-over" hidden="true">Game Over!</p>
       </div>
       <div id="controls">
         <button id="start" onclick="">Start</button>

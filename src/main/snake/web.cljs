@@ -2,10 +2,7 @@
   (:require [snake.game :as game])) 
 
 ;; Constants
-(def grid-size 60)
-(def block-size (/ grid-size 10))
-(def canvas-size (* grid-size block-size))
-(def mid-screen (/ canvas-size 2))
+(def grid-size 50)
 (def game-clock 70)
 
 ;; HTML Elements
@@ -13,6 +10,7 @@
 (def canvas-ctx (.getContext canvas "2d"))
 (def score-txt (.getElementById js/document "score"))
 (def start-button (.getElementById js/document "start"))
+(def game-over-text (.getElementById js/document "game-over"))
 
 ;; Global states
 (defonce game-state (atom {}))
@@ -54,12 +52,12 @@
       (reset! touch-state []))))
 
 (defn draw-block
-  [[x y]]
+  [[x y] block-width block-height]
   (.fillRect canvas-ctx
-             (* x block-size)
-             (* y block-size)
-             block-size
-             block-size))
+             (* x block-width)
+             (* y block-height)
+             block-width
+             block-height))
 
 (defn get-scores-display-text
   [score high-score]
@@ -68,7 +66,7 @@
 (defn clear-screen
   []
   (set! (.-fillStyle canvas-ctx) "rgb(255,255,255)")
-  (.fillRect canvas-ctx 0 0 canvas-size canvas-size))
+  (.fillRect canvas-ctx 0 0 (.-width canvas) (.-height canvas)))
 
 (defn set-score
   [score high-score]
@@ -78,18 +76,19 @@
   [{snake :snake
     food :food
     score :score
-    high-score :high-score}] 
-  (clear-screen)
-  (set! (.-fillStyle canvas-ctx) "rgb(255,0,0)")
-  (draw-block food)
-  (set! (.-fillStyle canvas-ctx) "rgb(0,0,0)")
-  (doseq [part snake] (draw-block part))
-  (set-score score high-score))
+    high-score :high-score}]
+  (let [block-width (quot (.-width canvas) grid-size)
+        block-height (quot (.-height canvas) grid-size)]
+    (clear-screen)
+    (set! (.-fillStyle canvas-ctx) "rgb(255,0,0)")
+    (draw-block food block-width block-height)
+    (set! (.-fillStyle canvas-ctx) "rgb(0,0,0)")
+    (doseq [part snake] (draw-block part block-width block-height))
+    (set-score score high-score)))
 
 (defn game-over
   []
-  (set! (.-font canvas-ctx) "30px Lucida")
-  (.fillText canvas-ctx "Game Over!" (- mid-screen 80) mid-screen)
+  (set! (.-hidden game-over-text) false)
   (set! (.-disabled start-button) false))
 
 (defn game-loop
@@ -105,24 +104,17 @@
   []
   (let [high-score (get @game-state :high-score 0)]
     (swap! game-state #(game/get-initial-state grid-size high-score))
+    (set! (.-hidden game-over-text) true)
     (set! (.-disabled start-button) true)
     (game-loop)))
 
 (defn init-game-screen
   []
-  (set! (.-width canvas) canvas-size)
-  (set! (.-height canvas) canvas-size)
   (clear-screen)
   (set-score 0 0)
-  (.addEventListener js/document
-                     "keydown"
-                     change-direction-on-keydown)
-  (.addEventListener js/document
-                     "touchstart"
-                     handle-touch-start)
-  (.addEventListener js/document
-                     "touchmove"
-                     handle-touch-move)
+  (.addEventListener js/document "keydown" change-direction-on-keydown)
+  (.addEventListener js/document "touchstart" handle-touch-start)
+  (.addEventListener js/document "touchmove" handle-touch-move)
   (set! (.-onclick start-button) start-game))
 
 (defn -main
