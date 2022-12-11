@@ -27,7 +27,7 @@
                          nil)]
     (swap! game-state #(game/change-direction % direction))))
 
-(defn- get-touch-pos
+(defn get-touch-pos
   [event]
   (let [touch-event (first (.-touches event))
         touch-x (.-clientX touch-event)
@@ -73,10 +73,7 @@
   (set! (.-innerHTML score-txt) (get-scores-display-text score high-score)))
 
 (defn draw-game-state
-  [{snake :snake
-    food :food
-    score :score
-    high-score :high-score}]
+  [{:keys [snake food score high-score]}]
   (let [block-width (quot (.-width canvas) grid-size)
         block-height (quot (.-height canvas) grid-size)]
     (clear-screen)
@@ -87,9 +84,10 @@
     (set-score score high-score)))
 
 (defn game-over
-  []
+  [{:keys [high-score]}]
   (set! (.-hidden game-over-text) false)
-  (set! (.-disabled start-button) false))
+  (set! (.-disabled start-button) false)
+  (.setItem js/localStorage "high-score" high-score))
 
 (defn game-loop
   []
@@ -98,11 +96,15 @@
     (cond (not (:dead state))
           (do (swap! game-state game/get-next-state)
               (js/setTimeout game-loop game-clock))
-          :else (game-over))))
+          :else (game-over state))))
+
+(defn get-current-high-score
+  []
+  (or (.getItem js/localStorage "high-score") 0))
 
 (defn start-game
   []
-  (let [high-score (get @game-state :high-score 0)]
+  (let [high-score (get-current-high-score)]
     (swap! game-state #(game/get-initial-state grid-size high-score))
     (set! (.-hidden game-over-text) true)
     (set! (.-disabled start-button) true)
@@ -111,7 +113,7 @@
 (defn init-game-screen
   []
   (clear-screen)
-  (set-score 0 0)
+  (set-score 0 (get-current-high-score))
   (.addEventListener js/document "keydown" change-direction-on-keydown)
   (.addEventListener js/document "touchstart" handle-touch-start)
   (.addEventListener js/document "touchmove" handle-touch-move)
