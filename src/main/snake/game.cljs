@@ -1,6 +1,19 @@
 (ns snake.game
   (:require [clojure.set :as set]))
 
+(def ^:private forbidden-moves #{[:up :down]
+                                 [:down :up]
+                                 [:left :right]
+                                 [:right :left]})
+
+(defn- get-initial-snake
+  [grid-size snake-size]
+  (let [mid-screen (quot grid-size 2)]
+    (->> snake-size
+         range
+         reverse
+         (mapv #(vector (- mid-screen %) mid-screen)))))
+
 (defn- get-next-food-pos
   [grid-size snake]
   (let [all-pos (set (for [x (range grid-size)
@@ -43,9 +56,9 @@
 (defn- eat-or-move
   [state]
   (let [{:keys [snake direction food grid-size]} state]
-    (cond (will-get-food? snake direction food grid-size)
-          (eat state)
-          :else (move state))))
+    (if (will-get-food? snake direction food grid-size)
+      (eat state)
+      (move state))))
 
 (defn- self-collided?
   [{snake :snake}]
@@ -57,7 +70,7 @@
   [state]
   (assoc state :dead (self-collided? state)))
 
-(defn update-high-score
+(defn- update-high-score
   [state]
   (assoc state :high-score (cond (:dead state)
                                  (max (:score state) (:high-score state))
@@ -72,10 +85,9 @@
 
 (defn get-initial-state
   [grid-size high-score]
-  (let [mid-screen (/ grid-size 2)
-        snake [[mid-screen mid-screen]]]
+  (let [snake (get-initial-snake grid-size 5)]
     {:grid-size grid-size
-     :snake snake
+     :snake snake 
      :direction :right
      :food (get-next-food-pos grid-size snake)
      :score 0
@@ -84,11 +96,6 @@
 
 (defn change-direction
   [state new-direction]
-  (let [forbidden-moves #{[:up :down]
-                          [:down :up]
-                          [:left :right]
-                          [:right :left]}]
-    (cond (not (contains? forbidden-moves
-                          [(:direction state) new-direction]))
-          (assoc state :direction new-direction)
-          :else state)))
+  (if (not (contains? forbidden-moves [(:direction state) new-direction]))
+    (assoc state :direction new-direction)
+    state))

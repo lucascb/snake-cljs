@@ -1,7 +1,7 @@
 body {
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     background: rgb(0,203,213);
-    background: radial-gradient(circle, rgba(0,203,213,1) 0%, rgba(0,255,225,1) 50%, rgba(0,212,255,1) 100%);
+    background: radial-gradient(circle, rgba(0,255,225,1) 50%, rgba(0,212,255,1) 100%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -16,6 +16,9 @@ body {
 
 #header {
     text-align: center;
+}
+
+#title {
     color: white;
     text-shadow: 2px 2px black;
 }
@@ -23,6 +26,11 @@ body {
 #score {
     font-size: large;
     font-weight: bold;
+}
+
+#game-over {
+    color: red;
+    visibility: hidden;
 }
 
 #game-canvas {
@@ -49,16 +57,17 @@ body {
     text-align: center;
     font-size: large;
     font-weight: bold;
+    width: 300px;
 }
 
-#game-over {
-    color: red;
-}
-
+/* For desktop: */
 @media only screen and (min-width: 700px) {
-    /* For desktop: */
     #game-canvas {
         width: 600px;
         height: 600px;
+    }
+
+    #instructions {
+        width: 600px;
     }
 }
