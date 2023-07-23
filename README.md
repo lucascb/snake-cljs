@@ -17,7 +17,15 @@ npm install
 Use shadow-cljs to start the local dev server
 
 ```
-npx shadow-cljs watch frontend
+npm start
 ```
 
 Go to http://localhost:8080/ and start playing! 🐍
+
+## Release
+
+To generate the static files:
+
+```
+npm run build
+```

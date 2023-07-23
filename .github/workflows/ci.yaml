@@ -1,0 +1,29 @@
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy game to github personal page
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build static files
+        run: npm run build
+      - name: Push to personal page
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+        with:
+          source-directory: public
+          destination-github-username: lucascb
+          destination-repository-name: lucascb.github.io
+          user-email: lucascbernardes@live.com
+          target-branch: master
+          target-directory: projects/snake-cljs

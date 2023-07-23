@@ -1,73 +1,78 @@
 body {
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-    background: rgb(0,203,213);
-    background: radial-gradient(circle, rgba(0,255,225,1) 50%, rgba(0,212,255,1) 100%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overscroll-behavior: contain;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  background: rgb(0, 203, 213);
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 225, 1) 50%,
+    rgba(0, 212, 255, 1) 100%
+  );
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overscroll-behavior: contain;
 }
 
 #container {
-    position: absolute;
-    top: 50%;
-    transform: translate(0, -50%);
+  position: absolute;
+  top: 50%;
+  transform: translate(0, -50%);
 }
 
 #header {
-    text-align: center;
+  text-align: center;
 }
 
 #title {
-    color: white;
-    text-shadow: 2px 2px black;
+  color: white;
+  text-shadow: 2px 2px black;
 }
 
 #score {
-    font-size: large;
-    font-weight: bold;
+  font-size: large;
+  font-weight: bold;
 }
 
 #game-over {
-    color: red;
-    visibility: hidden;
+  color: red;
+  visibility: hidden;
 }
 
 #game-canvas {
-    border: solid 5px black;
-    padding-left: 0;
-    padding-right: 0;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-    width: 300px;
-    height: 300px;
+  border: solid 5px black;
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  width: 300px;
+  height: 300px;
 }
 
 #controls {
-    text-align: center;
-    padding-top: 10px;
+  text-align: center;
+  padding-top: 10px;
 }
 
 #start {
-    font-size: 20px;
+  font-size: 20px;
 }
 
 #instructions {
-    text-align: center;
-    font-size: large;
-    font-weight: bold;
-    width: 300px;
+  text-align: center;
+  font-size: large;
+  font-weight: bold;
+  width: 300px;
 }
 
 /* For desktop: */
 @media only screen and (min-width: 700px) {
-    #game-canvas {
-        width: 600px;
-        height: 600px;
-    }
+  #game-canvas {
+    width: 600px;
+    height: 600px;
+  }
 
-    #instructions {
-        width: 600px;
-    }
+  #instructions {
+    width: 600px;
+  }
 }

@@ -10,6 +10,6 @@
  :dev-http {8080 "public"}
 
  :builds
- {:frontend
+ {:game
   {:target :browser
    :modules {:main {:init-fn snake.web/-main}}}}}

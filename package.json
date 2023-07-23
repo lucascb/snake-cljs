@@ -6,7 +6,12 @@
     "name": "Lucas Bernardes"
   },
   "private": true,
+  "scripts": {
+    "start": "shadow-cljs watch game",
+    "build": "shadow-cljs release game"
+  },
   "devDependencies": {
+    "prettier": "^3.0.0",
     "shadow-cljs": "2.19.8"
   }
 }
